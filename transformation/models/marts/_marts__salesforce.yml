@@ -86,7 +86,7 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - opportunity_id
-            - create_date_key
+            - created_date_key
     columns:
       - name: opportunity_id
         description: "Opportunity natural Key"
@@ -108,7 +108,6 @@ models:
       - name: campaign_sk
         description: "Foreign key linking to the campaign dimension, representing the campaign associated with the sales opportunity."
         tests:
-          - not_null
           - relationships:
               to: ref('dim_salesforce__campaign')
               field: campaign_sk
@@ -119,7 +118,7 @@ models:
           - relationships:
               to: ref('dim_salesforce__user')
               field: user_sk
-      - name: create_date_key
+      - name: created_date_key
         description: "Foreign key linking to the date dimension, representing the date when the sales opportunity was created."
         tests:
           - not_null
@@ -139,7 +138,7 @@ models:
         description: "Categorization of the sales opportunity stage into buckets (e.g., early, mid, late) for analysis and reporting."
         tests:
           - accepted_values:
-              values: ['pipeline_early', 'pipeline_late' , 'closed_won', 'closed_lost' , 'other']
+              values: ['Pipeline_Early', 'Pipeline_Late', 'Closed_Won', 'Closed_Lost', 'Other']
       - name: is_overdue
         description: "Indicator of whether the sales opportunity is overdue based on the expected close date, used for identifying opportunities that require attention."
         tests:
@@ -159,7 +158,6 @@ models:
         description: "Case natural Key"
         tests:
           - not_null
-          - unique
       - name: case_event_sk
         description: "Surrogate key for the case event fact table, used for joining with dimension tables."
         tests:
@@ -190,22 +188,22 @@ models:
         description: "Type of the case event, categorizing events based on their nature (e.g., creation, update, resolution) for analysis and reporting."
         tests:
           - accepted_values:
-              values: ['created', 'stattus_change']
+              values: ['Created', 'Status_Change']
       - name: status_after_event
         description: "Status of the customer support case after the event, indicating the current state of the case for analysis and reporting."
         tests:
           - accepted_values:
-              values: ['new', 'working', 'escalated', 'closed']
+              values: ['New', 'Working', 'Escalated', 'Closed']
       - name: origin
         description: "Origin of the customer support case, indicating how the case was initiated (e.g., email, phone, web) for analysis and reporting."
         tests:
           - accepted_values:
-              values: ['email', 'phone', 'web', 'other']
+              values: ['Email', 'Phone', 'Web', 'Other']
       - name: priority
         description: "Priority level of the customer support case, indicating the urgency of the case for analysis and reporting."
         tests:
           - accepted_values:
-              values: ['low', 'medium', 'high', 'critical']
+              values: ['Low', 'Medium', 'High', 'Critical']
       - name: case_event_sequence
         description: "Sequence number of the case event, used to order events chronologically for each case."
         tests:

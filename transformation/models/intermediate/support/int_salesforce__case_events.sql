@@ -32,8 +32,8 @@ case_created_events as (
         accountid as account_id,
         contactid as contact_id,
         ownerid as owner_user_id,
-        'Created' as event_type,
         createddate as event_timestamp,
+        'Created' as event_type,
         status as status_after_event,
         cast(null as string) as status_before_event,
         {{ sf_clean_text('priority') }} as priority,
@@ -55,7 +55,7 @@ status_history_events as (
         case_base.contactid as contact_id,
         coalesce(case_history.ownerid, case_base.ownerid) as owner_user_id,
         case_history.lastmodifieddate as event_timestamp,
-        'Status Change' as event_type,
+        'Status_Change' as event_type,
         case_history.status as status_after_event,
         case_history.previousupdate as status_before_event,
         {% for column_name in shared_case_columns %}
@@ -118,7 +118,7 @@ final as (
         systemmodstamp
     from ranked_events
     {% if is_incremental() %}
-        where event_timestamp > (select max(event_timestamp) from {{ this }})
+        where cast(event_timestamp as timestamp) > (select cast(max(event_timestamp) as timestamp) from {{ this }})
     {% endif %}
 
 )

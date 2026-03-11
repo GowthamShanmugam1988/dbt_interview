@@ -22,7 +22,7 @@ models:
         description: "Normalized stage grouping"
         tests:
           - accepted_values:
-              values: ['pipeline_early', 'pipeline_late', 'closed_won', 'closed_lost', 'other']
+              values: ['Pipeline_Early', 'Pipeline_Late', 'Closed_Won', 'Closed_Lost', 'Other']
       - name: owner_user_id
         description: "Opportunity owner user id"
 
@@ -69,7 +69,7 @@ models:
         description: "Type of the case event"
         tests:
           - accepted_values:
-              values: ['created', 'status_change']
+              values: ['Created', 'Status_Change']
       - name: event_timestamp
         description: "Timestamp of the case event"
         tests:
