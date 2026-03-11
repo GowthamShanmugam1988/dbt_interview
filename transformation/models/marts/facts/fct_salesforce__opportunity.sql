@@ -1,11 +1,11 @@
 {{ config(tags = ['fact','marts','sales']) }}
 
 {% set date_key_mapping = [
-    {'source_column': 'close_date', 'alias': 'close_date_key'},
-    {'source_column': 'created_date', 'alias': 'created_date_key'}
+    {'source_column': 'closedate', 'alias': 'close_date_key'},
+    {'source_column': 'createddate', 'alias': 'created_date_key'}
 ] %}
 
-{% set additive_metrics = ['amount', 'expected_revenue'] %}
+{% set additive_metrics = ['amount', 'expectedrevenue'] %}
 
 with opportunity as (
 
@@ -16,7 +16,7 @@ latest_stage as (
 
     select
         opportunity_id,
-        stage_name as latest_stagename,
+        stagename as latest_stagename,
         previous_stage_name,
         is_stage_transition,
         stage_changed_at as latest_stage_change_at
@@ -58,14 +58,14 @@ final as (
         {% for date_key in date_key_mapping %}
         cast(strftime(cast(opportunity.{{ date_key.source_column }} as date), '%Y%m%d') as int) as {{ date_key.alias }}{% if not loop.last %},{% endif %}
         {% endfor %},
-        opportunity.name as opportunity_name,
+        opportunity.opportunity_name as opportunity_name,
         opportunity.account_id,
         opportunity.contact_id,
         opportunity.campaign_id,
         opportunity.owner_user_id,
-        coalesce(latest_stage.latest_stagename, opportunity.stage_name) as current_stage_name,
-        coalesce(stage_targets.previous_stage_name, 'other') as previous_stage_name,
-        opportunity.stagebucket,
+        coalesce(latest_stage.latest_stagename, opportunity.stagename) as current_stage_name,
+        coalesce(stage_targets.stage_name, 'other') as previous_stage_name,
+        opportunity.stage_bucket,
         opportunity.forecastcategoryname as forecast_category,
         opportunity.deliveryinstallationstatus__c as delivery_installation_status,
         {% for metric in additive_metrics %}
@@ -73,7 +73,7 @@ final as (
         {% endfor %},
         stage_targets.target_win_probability as target_win_probability,
         {% if var('include_stage_target_gap', true) %}
-        opportunity.expected_revenue - (opportunity.amount * stage_targets.target_win_probability) as expected_revenue_gap,
+        opportunity.expectedrevenue - (opportunity.amount * stage_targets.target_win_probability) as expected_revenue_gap,
         {% endif %}
         opportunity.isclosed,
         opportunity.iswon,

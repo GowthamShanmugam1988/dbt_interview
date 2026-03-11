@@ -21,7 +21,7 @@ final as (
         case_event.case_id,
         account_dim.account_sk,
         user_dim.user_sk as owner_user_sk,
-        cast(strftime(case_event.event_timestamp, '%Y%m%d%H%M%S') as int) as event_timestamp_key,
+        case_event.event_timestamp AS event_timestamp_key,
         case_event.account_id,
         case_event.contact_id,
         case_event.owner_user_id,
