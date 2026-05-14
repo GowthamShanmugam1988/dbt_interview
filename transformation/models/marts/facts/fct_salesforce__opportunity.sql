@@ -47,6 +47,12 @@ campaign_dim as (
     select campaign_sk, campaign_id from {{ ref('dim_salesforce__campaign') }}
 
 ),
+
+contact_dim as (
+
+    select contact_sk, contact_id from {{ ref('dim_salesforce__contact') }}
+
+),
 final as (
 
     select
@@ -55,6 +61,7 @@ final as (
         account_dim.account_sk,
         user_dim.user_sk as owner_user_sk,
         campaign_dim.campaign_sk,
+        contact_dim.contact_sk,
         {% for date_key in date_key_mapping %}
         cast(strftime(cast(opportunity.{{ date_key.source_column }} as date), '%Y%m%d') as int) as {{ date_key.alias }}{% if not loop.last %},{% endif %}
         {% endfor %},
@@ -94,6 +101,6 @@ final as (
     left join account_dim on opportunity.account_id = account_dim.account_id
     left join user_dim on opportunity.owner_user_id = user_dim.user_id
     left join campaign_dim on opportunity.campaign_id = campaign_dim.campaign_id
-
+    left join contact_dim on opportunity.contact_id = contact_dim.contact_id
 )
 select * from final

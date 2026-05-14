@@ -63,6 +63,58 @@ models:
         tests:
           - not_null
 
+  - name: dim_salesforce__contact
+    description: "Dimension table for Salesforce contact data, providing a structured representation of contact attributes for analysis and reporting."
+    config:
+      tags: ['dimension','mart','contact']
+    columns:
+      - name: contact_id
+        description: "Contact natural Key"
+        tests:
+          - not_null
+          - unique
+      - name: contact_sk
+        description: "Surrogate key for the contact dimension, used for joining with fact tables."
+        tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: "Foreign key linking to the account dimension, representing the account associated with the contact."
+        tests:
+          - relationships:
+              to: ref('stg_salesforce__account')
+              field: account_id
+              config:
+                severity: warn
+      - name: is_deleted
+        description: "Indicator of whether the contact is deleted, used for filtering and analysis of deleted contacts."
+        tests:
+          - not_null
+
+  - name: dim_salesforce__product
+    description: "Dimension table for Salesforce product data, providing a structured representation of product attributes for analysis and reporting."
+    config:
+      tags: ['dimension','mart','product']
+    columns:
+      - name: product_id
+        description: "Product natural Key"
+        tests:
+          - not_null
+          - unique
+      - name: product_sk
+        description: "Surrogate key for the product dimension, used for joining with fact tables."
+        tests:
+          - not_null
+          - unique
+      - name: is_active
+        description: "Indicator of whether the product is currently active, used for filtering and analysis of active products."
+        tests:
+          - not_null
+      - name: is_deleted
+        description: "Indicator of whether the product is deleted, used for filtering and analysis of deleted products."
+        tests:
+          - not_null
+
   - name: dim_shared__date
     description: "Shared dimension table for date attributes, providing a structured representation of date-related information for analysis and reporting across multiple fact tables."
     config:

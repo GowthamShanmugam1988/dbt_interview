@@ -1,0 +1,242 @@
+version: 2
+
+models:
+  - name: stg_salesforce__account
+    description: '{{ doc("stg_account") }}'
+    columns:
+      - name: account_id
+        description: Primary key - Salesforce Account ID.
+        tests:
+          - not_null
+          - unique
+      - name: ownerid
+        description: FK to user who owns this account.
+      - name: industry
+        description: Industry classification of the account.
+      - name: type
+        description: Account type such as Customer or Partner.
+      - name: annualrevenue
+        description: Self-reported annual revenue.
+
+  - name: stg_salesforce__campaign
+    description: Staged Salesforce campaign records with marketing spend and response.
+    columns:
+      - name: campaign_id
+        description: Primary key - Salesforce Campaign ID.
+        tests:
+          - not_null
+          - unique
+      - name: ownerid
+        description: FK to user who owns this campaign.
+      - name: status
+        description: Current campaign status.
+      - name: type
+        description: Campaign channel or type classification.
+
+  - name: stg_salesforce__case
+    description: Staged Salesforce support case records with lifecycle and SLA attributes.
+    columns:
+      - name: case_id
+        description: Primary key - Salesforce Case ID.
+        tests:
+          - not_null
+          - unique
+      - name: accountid
+        description: FK to related account.
+        tests:
+          - relationships:
+              to: ref('stg_salesforce__account')
+              field: account_id
+              config:
+                severity: warn
+      - name: contactid
+        description: FK to related contact.
+      - name: status
+        description: Current case status.
+      - name: priority
+        description: Case priority - High, Medium, or Low.
+      - name: origin
+        description: Channel the case originated from.
+
+  - name: stg_salesforce__case_history_2
+    description: Staged case status change history used to build case event streams.
+    columns:
+      - name: case_history_id
+        description: Primary key - Salesforce CaseHistory ID.
+        tests:
+          - not_null
+          - unique
+      - name: caseid
+        description: FK to parent case.
+        tests:
+          - not_null
+      - name: status
+        description: Case status at the history event.
+      - name: previousupdate
+        description: Previous status update for the case.
+
+  - name: stg_salesforce__contact
+    description: Staged Salesforce contact records with communication preferences.
+    columns:
+      - name: contact_id
+        description: Primary key - Salesforce Contact ID.
+        tests:
+          - not_null
+          - unique
+      - name: accountid
+        description: FK to related account.
+        tests:
+          - relationships:
+              to: ref('stg_salesforce__account')
+              field: account_id
+              config:
+                severity: warn
+      - name: email
+        description: Contact email address.
+      - name: leadsource
+        description: Original lead source that created this contact.
+
+  - name: stg_salesforce__lead
+    description: Staged Salesforce lead records including conversion tracking fields.
+    columns:
+      - name: lead_id
+        description: Primary key - Salesforce Lead ID.
+        tests:
+          - not_null
+          - unique
+      - name: ownerid
+        description: FK to lead owner user.
+      - name: status
+        description: Current lead status.
+      - name: leadsource
+        description: Channel the lead originated from.
+      - name: isconverted
+        description: Whether the lead has been converted to a contact/account/opportunity.
+
+  - name: stg_salesforce__opportunity
+    description: Staged Salesforce opportunity records with pipeline and forecast attributes.
+    columns:
+      - name: opportunity_id
+        description: Primary key - Salesforce Opportunity ID.
+        tests:
+          - not_null
+          - unique
+      - name: accountid
+        description: FK to related account.
+        tests:
+          - relationships:
+              to: ref('stg_salesforce__account')
+              field: account_id
+              config:
+                severity: warn
+      - name: contactid
+        description: FK to primary contact on the opportunity.
+      - name: campaignid
+        description: FK to the primary campaign source.
+      - name: ownerid
+        description: FK to opportunity owner user.
+      - name: stagename
+        description: Current stage in the sales process.
+      - name: amount
+        description: Deal amount in the org default currency.
+
+  - name: stg_salesforce__opportunity_history
+    description: Staged opportunity field history used for stage progression analysis.
+    columns:
+      - name: opportunity_history_id
+        description: Primary key - Salesforce OpportunityHistory ID.
+        tests:
+          - not_null
+          - unique
+      - name: opportunityid
+        description: FK to parent opportunity.
+        tests:
+          - not_null
+      - name: stagename
+        description: Stage at the time of the history snapshot.
+      - name: amount
+        description: Opportunity amount at the history snapshot.
+
+  - name: stg_salesforce__pricebook_entry
+    description: Staged price book entries linking products to price books with unit prices.
+    columns:
+      - name: pricebook_entry_id
+        description: Primary key - Salesforce PricebookEntry ID.
+        tests:
+          - not_null
+          - unique
+      - name: product2id
+        description: FK to related product.
+        tests:
+          - not_null
+      - name: pricebook2id
+        description: FK to related price book.
+
+  - name: stg_salesforce__product_2
+    description: Staged Salesforce product catalog records.
+    columns:
+      - name: product_id
+        description: Primary key - Salesforce Product2 ID.
+        tests:
+          - not_null
+          - unique
+      - name: name
+        description: Product display name.
+      - name: family
+        description: Product family grouping.
+      - name: isactive
+        description: Whether product is currently active.
+
+  - name: stg_salesforce__record_type
+    description: Staged Salesforce record type metadata for object customization.
+    columns:
+      - name: record_type_id
+        description: Primary key - Salesforce RecordType ID.
+        tests:
+          - not_null
+          - unique
+      - name: sobjecttype
+        description: Salesforce object this record type applies to.
+
+  - name: stg_salesforce__solution
+    description: Staged Salesforce knowledge-base solution articles.
+    columns:
+      - name: solution_id
+        description: Primary key - Salesforce Solution ID.
+        tests:
+          - not_null
+          - unique
+      - name: status
+        description: Publication status of the solution.
+      - name: caseid
+        description: FK to related case, when available.
+
+  - name: stg_salesforce__user
+    description: Staged Salesforce user records with profile and login metadata.
+    columns:
+      - name: user_id
+        description: Primary key - Salesforce User ID.
+        tests:
+          - not_null
+          - unique
+      - name: userroleid
+        description: FK to user role.
+      - name: managerid
+        description: FK to manager user.
+      - name: isactive
+        description: Whether the user account is active.
+      - name: usertype
+        description: Salesforce user license type.
+
+  - name: stg_salesforce__user_role
+    description: Staged Salesforce user role hierarchy records.
+    columns:
+      - name: user_role_id
+        description: Primary key - Salesforce UserRole ID.
+        tests:
+          - not_null
+          - unique
+      - name: name
+        description: Role display name.
+      - name: parentroleid
+        description: FK to parent role in the hierarchy.

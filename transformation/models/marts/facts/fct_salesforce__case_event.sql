@@ -14,6 +14,12 @@ user_dim as (
     select user_sk, user_id, full_name from {{ ref('dim_salesforce__user') }}
 
 ),
+
+contact_dim as (
+
+    select contact_sk, contact_id from {{ ref('dim_salesforce__contact') }}
+
+),
 final as (
     
     select
@@ -21,6 +27,7 @@ final as (
         case_event.case_id,
         account_dim.account_sk,
         user_dim.user_sk as owner_user_sk,
+        contact_dim.contact_sk,
         strftime(case_event.event_timestamp, '%Y%m%d')::INTEGER AS event_date_key,
         case_event.account_id,
         case_event.contact_id,
@@ -40,6 +47,6 @@ final as (
     from case_event
     left join account_dim on case_event.account_id = account_dim.account_id
     left join user_dim on case_event.owner_user_id = user_dim.user_id
-
+    left join contact_dim on case_event.contact_id = contact_dim.contact_id
 )
 select * from final
