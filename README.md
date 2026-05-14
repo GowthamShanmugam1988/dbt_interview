@@ -9,7 +9,7 @@ Follow these steps in order to install requirements, install dbt packages, compl
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/GowthamShanmugam1988/dbt_interview/tree/feature_gowtham_interview
 cd dbt_interview/transformation
 ```
 
